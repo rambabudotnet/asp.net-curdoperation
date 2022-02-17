@@ -1,0 +1,1056 @@
+======================================ASP.NET with SQL Server===============================
+
+create database dbTest_9222
+use dbTest_9222
+select * from tblemployee
+select * from tblgender
+select * from tbldesignation
+select * from tblqualification
+select * from tblcountry
+select * from tblstate
+
+------------------------------------------------------
+
+
+
+
+
+
+create table tblgender
+(
+gid int primary key identity,
+gname varchar(50)
+)
+insert into tblgender(gname)values('male'),('female'),('other')
+
+create table tbldesignation
+(
+did int primary key identity,
+dname varchar(50)
+)
+insert into tbldesignation(dname)values('Software Engineer'),('HR'),('Accountant'),('Admin'),('Software Tester')
+
+create table tblqualification
+(
+qid int primary key identity,
+qname varchar(50)
+)
+insert into tblqualification(qname)values('mca'),('bca'),('b.tech'),('m.tech')
+
+create table tblcountry
+(
+cid int primary key identity,
+cname varchar(50)
+)
+insert into tblcountry(cname)values('India'),('Pakistan'),('USA')
+
+create table tblstate
+(
+sid int primary key identity,
+cid int,
+sname varchar(50)
+)
+insert into tblstate(cid,sname)values(1,'UP'),(1,'Bihar'),(2,'Sindh'),(2,'Khayber'),(3,'Newyork'),(3,'Texas')
+
+create table tblEmployee
+(
+id int primary key identity,
+name varchar(50),
+genderid int,
+designationid int,
+salary int,
+email varchar(50),
+mobile bigint,
+manager varchar(50),
+qualificationid int,
+countryid int,
+stateid int
+)
+
+create proc Employee_Insert
+@name varchar(50),
+@genderid int,
+@designationid int,
+@salary int,
+@email varchar(50),
+@mobile bigint,
+@manager varchar(50),
+@qualificationid int,
+@countryid int,
+@stateid int
+as
+begin
+	insert into tblemployee(name,genderid,designationid,salary,email,mobile,manager,qualificationid,countryid,stateid) 
+	values(@name,@genderid,@designationid,@salary,@email,@mobile,@manager,@qualificationid,@countryid,@stateid)
+end
+
+
+create proc EmployeeJoin
+as
+begin
+			select * from tblemployee
+			join tblgender on tblemployee.genderid=tblgender.gid
+			join tbldesignation on tblemployee.designationid=tbldesignation.did
+			join tblqualification on tblemployee.qualificationid=tblqualification.qid
+			join tblcountry on tblemployee.countryid=tblcountry.cid
+			join tblstate on tblemployee.stateid=tblstate.sid
+end
+
+create proc EmployeeDelete
+@id int
+as
+begin
+			delete from tblemployee where id=@id
+end
+
+
+create proc GenderGet
+as
+begin
+	select * from tblgender
+end
+
+create proc DesignationGet
+as
+begin
+	select * from tbldesignation
+end
+
+create proc QualificationGet
+as
+begin
+	select * from tblqualification
+end
+
+create proc CountryGet
+as
+begin
+	select * from tblcountry
+end
+
+create proc StateGet
+@countryid int
+as
+begin
+	select * from tblstate where cid=@countryid
+end
+
+
+
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EmployeeForm.aspx.cs" Inherits="Test_9222.EmployeeForm" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <center>
+            <table>
+                <tr style="background-color:dodgerblue;color:white;text-align:center;height:50px">
+                    <td colspan="2">Employee Form</td>
+                </tr>
+                <tr>
+                    <td>Employee Name :</td>
+                    <td><asp:TextBox ID="txtname" runat="server"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvname" runat="server" ValidationGroup="abc" ControlToValidate="txtname" ErrorMessage="please enter your name !!" Display="None"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Gender :</td>
+                    <td><asp:RadioButtonList ID="rblgender" runat="server" RepeatColumns="3"></asp:RadioButtonList>
+                    <asp:RequiredFieldValidator ID="ppp" runat="server" ValidationGroup="abc" ControlToValidate="rblgender" ErrorMessage="please select your gender !!" Display="None"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Designation :</td>
+                    <td><asp:DropDownList ID="ddldesignation" runat="server"></asp:DropDownList>
+                    <asp:RequiredFieldValidator ID="kkk" runat="server" ValidationGroup="abc" InitialValue="0" ControlToValidate="ddldesignation" ErrorMessage="please select your designation !!" Display="None"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Salary :</td>
+                    <td><asp:TextBox ID="txtsalary" runat="server"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ValidationGroup="abc" runat="server" ControlToValidate="txtsalary" Display="None" ErrorMessage="please enter your salary !!"></asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="gffdgf" runat="server" ControlToValidate="txtsalary" ValidationGroup="abc" Display="None" ErrorMessage="Salary should be only numeric !!" ValidationExpression="^[0-9]+$"></asp:RegularExpressionValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Email :</td>
+                    <td><asp:TextBox ID="txtemail" runat="server"></asp:TextBox>
+                         <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ValidationGroup="abc" runat="server" ControlToValidate="txtemail" Display="None" ErrorMessage="please enter your email !!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Mobile :</td>
+                    <td><asp:TextBox ID="txtmobile" runat="server"></asp:TextBox>
+                     <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ValidationGroup="abc" runat="server" ControlToValidate="txtmobile" Display="None" ErrorMessage="please enter your mobile number !!"></asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="ttyy" runat="server" ControlToValidate="txtmobile" ValidationGroup="abc" Display="None" ErrorMessage="mobile number should be only 10 digits !!" ValidationExpression="^\d{10}$"></asp:RegularExpressionValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Qualification :</td>
+                    <td><asp:DropDownList ID="ddlqual" runat="server"></asp:DropDownList>
+                         <asp:RequiredFieldValidator ID="RequiredFieldValidator6" ValidationGroup="abc" InitialValue="0" runat="server" ControlToValidate="ddlqual" Display="None" ErrorMessage="please select your qualification !!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+               <tr>
+                    <td>Manager Name :</td>
+                    <td><asp:TextBox ID="txtmanager" runat="server"></asp:TextBox>
+                         <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ValidationGroup="abc" runat="server" ControlToValidate="txtmanager" Display="None" ErrorMessage="please enter your manager name !!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>Employee Country :</td>
+                    <td><asp:DropDownList ID="ddlcountry" runat="server" OnSelectedIndexChanged="ddlcountry_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList>
+                     <asp:RequiredFieldValidator ID="RequiredFieldValidator8" ValidationGroup="abc" InitialValue="0" runat="server" ControlToValidate="ddlcountry" Display="None" ErrorMessage="please select your country !!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+
+                  <tr>
+                    <td>Employee State :</td>
+                    <td><asp:DropDownList ID="ddlstate" runat="server"></asp:DropDownList>
+                         <asp:RequiredFieldValidator ID="RequiredFieldValidator9" ValidationGroup="abc" runat="server" InitialValue="0" ControlToValidate="ddlstate" Display="None" ErrorMessage="please select your state !!"></asp:RequiredFieldValidator>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td></td>
+                    <td><asp:Button ID="btnsave" runat="server" Text="Save" ValidationGroup="abc" OnClick="btnsave_Click" />
+                        <asp:Button ID="btnreset" runat="server" Text="Reset" OnClick="btnreset_Click" />
+                    </td>
+                </tr>
+
+
+                <asp:ValidationSummary ID="popup" runat="server" ValidationGroup="abc" ShowMessageBox="true" ShowSummary="false" />
+
+
+                <tr style="background-color:dodgerblue;color:white;text-align:center;height:50px">
+                    <td colspan="2">List Of Employees</td>
+                </tr>
+
+                 <tr>
+                    <td></td>
+                    <td><asp:GridView ID="gvemployee" runat="server" OnRowCommand="gvemployee_RowCommand" AutoGenerateColumns="False" CellPadding="4" ForeColor="#333333" GridLines="None">
+                        <AlternatingRowStyle BackColor="White" />
+                        <Columns>
+                            <asp:TemplateField HeaderText="Employee ID">
+                                <ItemTemplate>
+                                    <%#Eval("id") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Employee Name">
+                                <ItemTemplate>
+                                    <%#Eval("name") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Gender">
+                                <ItemTemplate>
+                                    <%#Eval("gname") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Designation">
+                                <ItemTemplate>
+                                    <%#Eval("dname") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Salary">
+                                <ItemTemplate>
+                                    Rs. <%#Eval("salary") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Email">
+                                <ItemTemplate>
+                                    <%#Eval("email") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Mobile No">
+                                <ItemTemplate>
+                                    <%#Eval("mobile") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Manager Name">
+                                <ItemTemplate>
+                                    <%#Eval("manager") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Qualification">
+                                <ItemTemplate>
+                                    <%#Eval("qname") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="Country">
+                                <ItemTemplate>
+                                    <%#Eval("cname") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                             <asp:TemplateField HeaderText="State">
+                                <ItemTemplate>
+                                    <%#Eval("sname") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                              <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:Button ID="btndelete" runat="server" Text="Delete" OnClientClick="return confirm('are you sure you want to delete ?')" CommandName="A" CommandArgument='<%#Eval("id") %>' />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                        <EditRowStyle BackColor="#7C6F57" />
+                        <FooterStyle BackColor="#1C5E55" ForeColor="White" Font-Bold="True" />
+                        <HeaderStyle BackColor="#1C5E55" Font-Bold="True" ForeColor="White" />
+                        <PagerStyle BackColor="#666666" ForeColor="White" HorizontalAlign="Center" />
+                        <RowStyle BackColor="#E3EAEB" />
+                        <SelectedRowStyle BackColor="#C5BBAF" Font-Bold="True" ForeColor="#333333" />
+                        <SortedAscendingCellStyle BackColor="#F8FAFA" />
+                        <SortedAscendingHeaderStyle BackColor="#246B61" />
+                        <SortedDescendingCellStyle BackColor="#D4DFE1" />
+                        <SortedDescendingHeaderStyle BackColor="#15524A" />
+                        </asp:GridView></td>
+                </tr>
+
+                 
+            </table>
+                </center>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+using System.Configuration;
+
+namespace Test_9222
+{
+    public partial class EmployeeForm : System.Web.UI.Page
+    {
+        SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["xyz"].ConnectionString);
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if(!IsPostBack)
+            {
+                BindGrid();
+                BindGender();
+                BindDesignation();
+                BindQualification();
+                BindCountry();
+                ddlstate.Items.Insert(0, new ListItem("--Select--", "0"));
+                ddlstate.Enabled = false;
+            }
+        }
+
+        public void BindGender()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("GenderGet", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            rblgender.DataValueField = "gid";
+            rblgender.DataTextField = "gname";
+            rblgender.DataSource = dt;
+            rblgender.DataBind();
+        }
+
+        public void BindDesignation()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("DesignationGet", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            ddldesignation.DataValueField = "did";
+            ddldesignation.DataTextField = "dname";
+            ddldesignation.DataSource = dt;
+            ddldesignation.DataBind();
+            ddldesignation.Items.Insert(0,new ListItem("--Select--","0"));
+        }
+
+        public void BindQualification()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("QualificationGet", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            ddlqual.DataValueField = "qid";
+            ddlqual.DataTextField = "qname";
+            ddlqual.DataSource = dt;
+            ddlqual.DataBind();
+            ddlqual.Items.Insert(0, new ListItem("--Select--", "0"));
+        }
+
+        public void BindCountry()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("CountryGet", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            ddlcountry.DataValueField = "cid";
+            ddlcountry.DataTextField = "cname";
+            ddlcountry.DataSource = dt;
+            ddlcountry.DataBind();
+            ddlcountry.Items.Insert(0, new ListItem("--Select--", "0"));
+        }
+
+        public void BindState()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("StateGet", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@countryid",ddlcountry.SelectedValue);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            ddlstate.Enabled = true;
+            ddlstate.DataValueField = "sid";
+            ddlstate.DataTextField = "sname";
+            ddlstate.DataSource = dt;
+            ddlstate.DataBind();
+            ddlstate.Items.Insert(0, new ListItem("--Select--", "0"));
+        }
+
+        public void BindGrid()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("EmployeeJoin", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+            gvemployee.DataSource = dt;
+            gvemployee.DataBind();
+        }
+
+
+        protected void ddlcountry_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ddlcountry.SelectedValue == "0")
+            {
+                ddlstate.Enabled = false;
+            }
+            else
+            {
+                BindState();
+            }
+        }
+
+        protected void btnsave_Click(object sender, EventArgs e)
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Employee_Insert", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@name", txtname.Text);
+            cmd.Parameters.AddWithValue("@genderid", rblgender.SelectedValue);
+            cmd.Parameters.AddWithValue("@designationid", ddldesignation.SelectedValue);
+            cmd.Parameters.AddWithValue("@salary", txtsalary.Text);
+            cmd.Parameters.AddWithValue("@mobile", txtmobile.Text);
+            cmd.Parameters.AddWithValue("@manager", txtmanager.Text);
+            cmd.Parameters.AddWithValue("@email", txtemail.Text);
+            cmd.Parameters.AddWithValue("@qualificationid", ddlqual.SelectedValue);
+            cmd.Parameters.AddWithValue("@countryid", ddlcountry.SelectedValue);
+            cmd.Parameters.AddWithValue("@stateid", ddlstate.SelectedValue);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BindGrid();
+        }
+
+        protected void btnreset_Click(object sender, EventArgs e)
+        {
+            Clear();
+        }
+
+        public void Clear()
+        {
+            txtname.Text = "";
+            txtmobile.Text = "";
+            txtsalary.Text = "";
+            txtemail.Text = "";
+            txtmanager.Text = "";
+            rblgender.ClearSelection();
+            ddldesignation.SelectedValue = "0";
+            ddlqual.SelectedValue = "0";
+            ddlcountry.SelectedValue = "0";
+            ddlstate.SelectedValue = "0";
+            ddlstate.Enabled = false;
+            btnsave.Text = "Save";
+        }
+
+        protected void gvemployee_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if(e.CommandName=="A")
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("EmployeeDelete", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", e.CommandArgument);
+                cmd.ExecuteNonQuery();
+                con.Close();
+                BindGrid();
+            }
+        }
+    }
+}
+=================================================================================================================================================
+                                  
+=================================================================================================================================================
+                                              ASP.NET WITH SQL SERVER     PYAR MOHAMMAD
+
+create database db090222
+use db090222
+
+create table Emp_Reg
+(
+  id int primary key identity,
+  emp_name varchar(50),
+  designation varchar(50),
+  salary int,
+  email varchar(50),
+  mobile varchar(50),
+  qualification varchar(50),
+  manager varchar(50)
+)
+
+select *from Emp_Reg
+
+create table Designation
+(
+  did int primary key identity,
+  dname varchar(50)
+)
+insert into Designation(dname)values('CEO')
+insert into Designation(dname)values('Project Manager')
+insert into Designation(dname)values('Team Leader')
+
+select *from Designation
+
+create table Qualification
+(
+  qid int primary key identity,
+  qname varchar(50)
+)
+insert into Qualification(qname)values('MBA')
+insert into Qualification(qname)values('M.Tech')
+insert into Qualification(qname)values('B.Tech')
+
+select *from Qualification
+
+alter proc usp_Emp_Reg
+@action varchar(50)=null,
+@id int=0,
+@emp_name varchar(50)=null,
+@designation varchar(50)=null,
+@salary int=0,
+@email varchar(50)=null,
+@mobile varchar(50)=null,
+@qualification varchar(50)=null,
+@manager varchar(50)=null
+as
+begin
+      if(@action='insert')
+	  begin
+	  insert into Emp_Reg(emp_name,designation,salary,email,mobile,qualification,manager)values(@emp_name,@designation,@salary,@email,@mobile,@qualification,@manager) 
+	  end
+
+      else if(@action='binddesignation')
+	  begin
+	  select *from Designation
+	  end
+
+	  else if(@action='bindqualification')
+	  begin
+	  select *from Qualification
+	  end
+
+      else if(@action='show')
+	  begin
+	  select *from Emp_Reg 
+	  end
+
+      else if(@action='delete')
+	  begin
+	   delete from Emp_Reg where id=@id
+	  end
+
+      else if(@action='edit')
+	  begin
+	  select *from Emp_Reg where id=@id
+	  end
+
+      else if(@action='update')
+	  begin
+	  update Emp_Reg set emp_name=@emp_name,designation=@designation,salary=@salary,email=@email,mobile=@mobile,qualification=@qualification,manager=@manager where id=@id 
+	  end
+
+      else if(@action='join')
+	  begin
+	  select * from Emp_Reg
+	  inner join Designation on Emp_Reg.designation = Designation.did
+	  inner join Qualification on Emp_Reg.qualification = Qualification.qid
+	  end
+end
+
+select *from Emp_Reg
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="p090222.aspx.cs" Inherits="aspx090222.p090222" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <script type="text/javascript">
+        function Validation() {
+            var dabba = "";
+
+            dabba += checkname();
+            dabba += checkdesignation();
+            dabba += checksalary();
+            dabba += checkemail();
+            dabba += checkmobile();
+            dabba += checkqualification();
+            dabba += checkmanager();
+
+            if (dabba == "") {
+                return true;
+            }
+            else {
+                alert(dabba);
+                return false;
+            }
+        }
+        function checkname() {
+            var TB = document.getElementById('txtname');
+            if (TB.value == "") {
+                return 'Please enter your name\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checkdesignation() {
+            var TB = document.getElementById('ddldesignation');
+            if (TB.value == "0") {
+                return 'Please enter your designation\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checksalary() {
+            var TB = document.getElementById('txtsal');
+            if (TB.value == "") {
+                return 'Please enter your salary\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checkemail() {
+            var TB = document.getElementById('txtemail');
+            if (TB.value == "") {
+                return 'Please enter your email\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checkmobile() {
+            var TB = document.getElementById('txtmobile');
+            if (TB.value == "") {
+                return 'Please enter your mobile no\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checkqualification() {
+            var TB = document.getElementById('ddlqualification');
+            if (TB.value == "0") {
+                return 'Please enter your qualification\n'
+            }
+            else {
+                return "";
+            }
+        }
+        function checkmanager() {
+            var TB = document.getElementById('txtmanager');
+            if (TB.value == "") {
+                return 'Please enter your manager\n'
+            }
+            else {
+                return "";
+            }
+        }
+    </script>
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <p style="background-color: rebeccapurple; color: white; height: 50px; width: 100.6%">
+                <b><u>
+                    <br />
+                    Employee Registration</u></b>
+            </p>          
+            <table style="text-align: center">
+                <tr>
+                    <th>Employee Name: 
+                     <asp:TextBox ID="txtname" runat="server"></asp:TextBox></th>
+                </tr>
+                <tr>
+                    <th>Designation  : 
+                        <asp:DropDownList ID="ddldesignation" runat="server"></asp:DropDownList></th>
+                </tr>
+                <tr>
+                    <th>Salary : 
+                        <asp:TextBox ID="txtsal" runat="server"></asp:TextBox></th>
+                </tr>
+                <tr>
+                    <th>E-mail : 
+                        <asp:TextBox ID="txtemail" runat="server" TextMode="Email"></asp:TextBox></th>
+                </tr>
+                <tr>
+                    <th>Mobile :
+                        <asp:TextBox ID="txtmobile" runat="server"></asp:TextBox></th>
+                </tr>
+                <tr>
+                    <th>Qualification : 
+                        <asp:DropDownList ID="ddlqualification" runat="server"></asp:DropDownList></th>
+                </tr>
+                <tr>
+                    <th>Manager : 
+                        <asp:TextBox ID="txtmanager" runat="server"></asp:TextBox></th>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Button ID="btnsave" runat="server" Text="SAVE" OnClientClick="return Validation()" OnClick="btnsave_Click" />
+                        <asp:Button ID="btnreset" runat="server" Text="Reset" OnClick="btnreset_Click" /></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <p style="background-color: rebeccapurple; color: white; height: 50px; text-align: left; width: 153.6%;">
+                            <b><u>
+                                <br />
+                                Register Employee</u></b>
+                        </p>
+                        <asp:GridView ID="grd" runat="server" AutoGenerateColumns="false" OnRowCommand="grd_RowCommand1" Width="154%">
+                            <Columns>
+                                <asp:TemplateField HeaderText="Employee Name">
+                                    <ItemTemplate>
+                                        <%#Eval("emp_name") %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Designation">
+                                    <ItemTemplate>
+                                        <%#Eval("dname")%>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Salary">
+                                    <ItemTemplate>
+                                        <%#Eval("salary") %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="E-mail">
+                                    <ItemTemplate>
+                                        <%#Eval("email") %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Mobile ">
+                                    <ItemTemplate>
+                                        <%#Eval("mobile") %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Qualification">
+                                    <ItemTemplate>
+                                        <%#Eval("qname")%>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Manager">
+                                    <ItemTemplate>
+                                        <%#Eval("manager")%>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Edit">
+                                    <ItemTemplate>
+                                        <asp:LinkButton ID="btnedit" runat="server" Text="Edit" CommandName="E" CommandArgument='<%#Eval("id") %>'></asp:LinkButton>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="DELETE">
+                                    <ItemTemplate>
+                                        <asp:LinkButton ID="btndelete" runat="server" Text="DELETE" CommandName="D" CommandArgument='<%#Eval("id") %>'></asp:LinkButton>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                            </Columns>
+                        </asp:GridView>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace aspx090222
+{
+    public partial class p090222 : System.Web.UI.Page
+    {
+        SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["dbcs"].ConnectionString);
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                disp();
+                binddesignation();
+                bindqualification();
+            }
+        }
+        protected void btnsave_Click(object sender, EventArgs e)
+        {
+            if (btnsave.Text == "SAVE")
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "insert");
+                cmd.Parameters.AddWithValue("@emp_name", txtname.Text);
+                cmd.Parameters.AddWithValue("@designation", ddldesignation.SelectedValue);
+                cmd.Parameters.AddWithValue("@salary", txtsal.Text);
+                cmd.Parameters.AddWithValue("@email", txtemail.Text);
+                cmd.Parameters.AddWithValue("@mobile", txtmobile.Text);
+                cmd.Parameters.AddWithValue("@qualification", ddlqualification.SelectedValue);
+                cmd.Parameters.AddWithValue("@manager", txtmanager.Text);
+                cmd.ExecuteNonQuery();
+                con.Close();
+                disp();
+            }
+            else if (btnsave.Text == "Update")
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "update");
+                cmd.Parameters.AddWithValue("@id", ViewState["xyz"]);
+                cmd.Parameters.AddWithValue("@emp_name", txtname.Text);
+                cmd.Parameters.AddWithValue("@designation", ddldesignation.SelectedValue);
+                cmd.Parameters.AddWithValue("@salary", txtsal.Text);
+                cmd.Parameters.AddWithValue("@email", txtemail.Text);
+                cmd.Parameters.AddWithValue("@mobile", txtmobile.Text);
+                cmd.Parameters.AddWithValue("@qualification", ddlqualification.SelectedValue);
+                cmd.Parameters.AddWithValue("@manager", txtmanager.Text);
+                cmd.ExecuteNonQuery();
+                con.Close();
+                disp();
+            }
+        }
+        public void disp()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "join");
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+
+            grd.DataSource = dt;
+            grd.DataBind();
+        }
+        public void binddesignation()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "binddesignation");
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+
+            ddldesignation.DataValueField = "did";
+            ddldesignation.DataTextField = "dname";
+
+            ddldesignation.DataSource = dt;
+            ddldesignation.DataBind();
+
+            ddldesignation.Items.Insert(0, new ListItem("--SELECT--", "0"));
+        }
+        public void bindqualification()
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "bindqualification");
+            cmd.Parameters.AddWithValue("@id", ddlqualification.SelectedValue);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            con.Close();
+
+            ddlqualification.DataValueField = "qid";
+            ddlqualification.DataTextField = "qname";
+
+            ddlqualification.DataSource = dt;
+            ddlqualification.DataBind();
+
+            ddlqualification.Items.Insert(0, new ListItem("--SELECT--", "0"));
+        }
+        protected void grd_RowCommand1(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "D")
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "delete");
+                cmd.Parameters.AddWithValue("@id", e.CommandArgument);
+                cmd.ExecuteNonQuery();
+                con.Close();
+                disp();
+            }
+            else if (e.CommandName == "E")
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("usp_Emp_Reg", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "edit");
+                cmd.Parameters.AddWithValue("@id", e.CommandArgument);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                con.Close();
+
+                txtname.Text = dt.Rows[0]["emp_name"].ToString();
+                ddldesignation.SelectedValue = dt.Rows[0]["designation"].ToString();
+                txtsal.Text = dt.Rows[0]["salary"].ToString();
+                txtemail.Text = dt.Rows[0]["email"].ToString();
+                txtmobile.Text = dt.Rows[0]["mobile"].ToString();
+                ddlqualification.SelectedValue = dt.Rows[0]["qualification"].ToString();
+                txtmanager.Text = dt.Rows[0]["manager"].ToString();
+                btnsave.Text = "Update";
+
+                ViewState["xyz"] = e.CommandArgument;
+            }
+        }
+
+        protected void btnreset_Click(object sender, EventArgs e)
+        {
+            txtname.Text = "";
+            ddldesignation.SelectedValue = "0";
+            txtsal.Text = "";
+            txtemail.Text = "";
+            txtmobile.Text = "";
+            ddlqualification.SelectedValue = "0";
+            txtmanager.Text = "";
+            btnsave.Text = "SAVE";
+        }
+    }
+}
+
+
+
+===========Webconfig=======
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  https://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+	<connectionStrings>
+		<add name="dbcs" connectionString="data source=DESKTOP-92UQOR3; initial catalog=db090222; integrated security=true" />
+	</connectionStrings>
+	<system.web>
+		<compilation debug="true" targetFramework="4.7.2" />
+		<httpRuntime targetFramework="4.7.2" />
+		<pages>
+			<namespaces>
+				<add namespace="System.Web.Optimization" />
+			</namespaces>
+			<controls>
+				<add assembly="Microsoft.AspNet.Web.Optimization.WebForms" namespace="Microsoft.AspNet.Web.Optimization.WebForms" tagPrefix="webopt" />
+			</controls>
+		</pages>
+	</system.web>
+	<runtime>
+		<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			<dependentAssembly>
+				<assemblyIdentity name="Antlr3.Runtime" publicKeyToken="eb42632606e9261f" />
+				<bindingRedirect oldVersion="0.0.0.0-3.5.0.2" newVersion="3.5.0.2" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" />
+				<bindingRedirect oldVersion="0.0.0.0-12.0.0.0" newVersion="12.0.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="WebGrease" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="0.0.0.0-1.6.5135.21930" newVersion="1.6.5135.21930" />
+			</dependentAssembly>
+		</assemblyBinding>
+	</runtime>
+	<system.codedom>
+		<compilers>
+			<compiler language="c#;cs;csharp" extension=".cs" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:default /nowarn:1659;1699;1701" />
+			<compiler language="vb;vbs;visualbasic;vbscript" extension=".vb" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:default /nowarn:41008 /define:_MYTYPE=\&quot;Web\&quot; /optionInfer+" />
+		</compilers>
+	</system.codedom>
+</configuration>
